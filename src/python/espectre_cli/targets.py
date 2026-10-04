@@ -23,6 +23,7 @@ ESPHOME_CONFIGS = {
     "c5": ESPHOME_EXAMPLES_DIR / "espectre-c5.yaml",
     "c6": ESPHOME_EXAMPLES_DIR / "espectre-c6.yaml",
     "s3": ESPHOME_EXAMPLES_DIR / "espectre-s3.yaml",
+    "s3-macronix": ESPHOME_EXAMPLES_DIR / "espectre-s3-macronix.yaml",
     "s2": ESPHOME_EXAMPLES_DIR / "espectre-s2.yaml",
 }
 
@@ -32,6 +33,7 @@ IDF_TARGET_BY_CHIP = {
     "c5": "esp32c5",
     "c6": "esp32c6",
     "s3": "esp32s3",
+    "s3-macronix": "esp32s3",
     "s2": "esp32s2",
 }
 

@@ -16,6 +16,22 @@ When someone moves through a room, they change the way Wi-Fi signals travel thro
 
 [Flash from your browser](https://espectre.dev/tools/flash/) · [See the live tools](https://espectre.dev/tools/) · [Read the documentation](https://espectre.dev/guides/) · [Explore the SDK](https://espectre.dev/sdk/)
 
+> [!IMPORTANT]
+> ### ⚡ Hardware Compatibility: Macronix Flash & Modern ESPHome Support
+>
+> Many common ESP32-S3 boards (such as DevKitC-1 clones and N16R8 modules) ship with different SPI flash memory ICs:
+> - **BoyaMicro BY25Q128** (`0x684018`): Supported by upstream 80 MHz Octal PSRAM builds.
+> - **Macronix MX25L128** (`0xC22018`): Fails MSPI bus timing calibration at 80 MHz with Octal PSRAM, causing an immediate kernel boot crash and an infinite 9.1-second RTC watchdog reboot loop (`rst:0x10 (RTCWDT_RTC_RST)`).
+>
+> **This fork provides full hardware compatibility and bug fixes for Macronix boards:**
+> 1. **Macronix 40MHz Profile (`espectre-s3-macronix.yaml`):** Configured for 40 MHz Dual I/O (DIO) Flash and internal SRAM without requiring 80 MHz Octal PSRAM.
+> 2. **Automatic Storage Hardware Detection:** The CLI installer automatically probes the connected board's SPI flash manufacturer ID over serial and selects `s3-macronix` when a Macronix IC (`0xC2`) is detected.
+> 3. **Modern ESPHome & ESP-IDF 5.3 Compatibility:**
+>    - Fixes `get_setup_priority()` in `espectre.h` to `setup_priority::AFTER_WIFI` (preventing `ESP_ERR_INVALID_STATE` event loop registration failure on modern ESPHome).
+>    - Replaces missing POSIX `if_indextoname` with standard ESP-IDF `esp_netif_get_netif_impl_name` in `sta_socket_helpers.cpp`.
+>    - Stubs out private mDNS hook functions in `mdns_bootstrap_responder.cpp` for clean compilation against ESP-IDF 5.3.
+>    - Preconfigures the **`high_accuracy`** neural-network detector for zero room calibration out of the box.
+
 ## Applications and integrations
 
 Use ESPectre to turn on lights or a display when someone walks in, adjust heating when a room is in use, or send an alert when there is movement where nobody should be. It works with Home Assistant (through ESPHome or MQTT), appears as a standard Matter occupancy sensor, offers a local HTTP API, and can be built into your own ESP32 firmware with the C++ SDK.

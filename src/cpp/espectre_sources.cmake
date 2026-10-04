@@ -89,7 +89,6 @@ set(ESPECTRE_RUNTIME_ESP_IDF_MQTT_SOURCES
 # headers. Source-list targets link with these options and add the
 # `private_include` directory of the `espressif__mdns` component.
 set(ESPECTRE_RUNTIME_ESP_IDF_DIRECT_LINK_OPTIONS
-    "LINKER:--wrap=mdns_priv_receive_action"
 )
 
 set(ESPECTRE_RUNTIME_ESP_IDF_DIRECT_SOURCES

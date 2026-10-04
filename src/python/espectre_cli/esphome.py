@@ -110,8 +110,32 @@ def _is_network_device(device: str | None) -> bool:
     return True
 
 
+def probe_flash_manufacturer(port: str) -> int | None:
+    """Probe the SPI flash manufacturer ID byte on a serial port."""
+    try:
+        import esptool
+        esp = esptool.cmds.detect_chip(port)
+        flash_id = esp.flash_id()
+        esp.hard_reset()
+        return (flash_id >> 16) & 0xFF
+    except Exception:
+        return None
+
+
 def run_esphome_command(args) -> None:
     """Run an ESPHome action against the resolved repository config."""
+    device = getattr(args, "device", None)
+    if getattr(args, "chip", None) in {"s3", None} and getattr(args, "config", None) is None and not _is_network_device(device):
+        try:
+            probe_port = resolve_serial_port(device, chip=args.chip or "s3", frontend="esphome", purpose="probe")
+            if probe_port:
+                mfg = probe_flash_manufacturer(probe_port)
+                if mfg == 0xC2:
+                    print(f"{Fore.YELLOW}ℹ️  Detected Macronix MX25L SPI flash (0xC2). Auto-selecting s3-macronix profile (40MHz DIO / internal SRAM).{Style.RESET_ALL}")
+                    args.chip = "s3-macronix"
+        except Exception:
+            pass
+
     try:
         config_path = resolve_esphome_config(args.chip, args.config)
     except ValueError as e:

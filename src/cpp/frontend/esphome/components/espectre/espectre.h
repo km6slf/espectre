@@ -63,9 +63,8 @@ class ESpectreComponent : public Component, public IRuntimeListener
   void loop() override;
   ~ESpectreComponent();
   void dump_config() override;
-  // Register STA_START after ESPHome creates the event loop, but before its
-  // Wi-Fi component starts scanning and associating.
-  float get_setup_priority() const override { return 275.0f; }
+  // Register after ESPHome creates the event loop and starts Wi-Fi component.
+  float get_setup_priority() const override { return setup_priority::AFTER_WIFI; }
 
   // Setters for YAML configuration
   void set_direct_api(bool enabled) { this->direct_api_enabled_ = enabled; }

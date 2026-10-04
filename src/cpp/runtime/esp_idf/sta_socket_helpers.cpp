@@ -31,7 +31,7 @@ bool bind_socket_to_sta_interface(int sock, const char *log_tag, const char *pur
   }
 
   struct ifreq iface{};
-  if (if_indextoname(static_cast<unsigned>(if_index), iface.ifr_name) == nullptr) {
+  if (esp_netif_get_netif_impl_name(netif, iface.ifr_name) != ESP_OK) {
     ESPECTRE_LOGW(log_tag, "Failed to resolve STA interface name for %s socket index %" PRIu32,
              purpose, static_cast<uint32_t>(if_index));
     return false;

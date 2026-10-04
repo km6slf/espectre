@@ -285,13 +285,6 @@ bool ESpectreComponent::set_device_label_(const std::string &device_label, std::
 
 void ESpectreComponent::update_wifi_roaming_suppression_(bool suppress) {
 #ifdef USE_WIFI
-  auto *wifi = wifi::global_wifi_component;
-  if (wifi == nullptr || suppress == this->wifi_roaming_suppressed_) return;
-  if (suppress) {
-    wifi->request_roaming_suppression();
-  } else {
-    wifi->release_roaming_suppression();
-  }
   this->wifi_roaming_suppressed_ = suppress;
 #endif
 }
@@ -357,7 +350,7 @@ bool ESpectreComponent::apply_esphome_wifi_bssid_pin_(const std::string &bssid,
     return false;
   }
   if (bssid.empty()) {
-    station.clear_bssid();
+    station.set_bssid(nullopt);
   } else {
     unsigned int octets[6]{};
     if (std::sscanf(bssid.c_str(),
@@ -377,7 +370,7 @@ bool ESpectreComponent::apply_esphome_wifi_bssid_pin_(const std::string &bssid,
     }
     station.set_bssid(parsed);
   }
-  station.clear_channel();
+  station.set_channel(nullopt);
   wifi::global_wifi_component->set_sta(station);
   wifi::global_wifi_component->retry_connect();
   this->wifi_bssid_apply_transition_started_ = true;

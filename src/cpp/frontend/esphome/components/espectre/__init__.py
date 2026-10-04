@@ -26,7 +26,10 @@ from esphome.components.esp32 import (
     const as esp32_const,
     get_esp32_variant,
 )
-from esphome.components.wifi import CONF_BAND_MODE
+try:
+    from esphome.components.wifi import CONF_BAND_MODE
+except ImportError:
+    CONF_BAND_MODE = "band_mode"
 from esphome.const import (
     CONF_COMPONENTS,
     CONF_ESPHOME,
@@ -52,7 +55,13 @@ from esphome.const import (
     DEVICE_CLASS_SIGNAL_STRENGTH,
     TYPE_GIT,
 )
-from esphome.core import CORE, CoroPriority, coroutine_with_priority
+from esphome.core import CORE, coroutine_with_priority
+try:
+    from esphome.core import CoroPriority
+except ImportError:
+    class CoroPriority:
+        WORKAROUNDS = 50.0
+        DEFAULT = 0.0
 
 DEPENDENCIES = ["logger", "wifi"]
 AUTO_LOAD = ["sensor", "binary_sensor", "button", "number", "select", "switch", "mdns"]
@@ -502,9 +511,12 @@ async def to_code(config):
         add_idf_sdkconfig_option("CONFIG_APP_PROJECT_VER_FROM_CONFIG", True)
         add_idf_sdkconfig_option("CONFIG_APP_PROJECT_VER", version)
     add_idf_component(name="espectre", path=str(_COMPONENT_ROOT))
-    wifi.request_wifi_ip_state_listener()
-    wifi.request_wifi_connect_state_listener()
-    wifi.enable_runtime_roaming_suppression()
+    if hasattr(wifi, "request_wifi_ip_state_listener"):
+        wifi.request_wifi_ip_state_listener()
+    if hasattr(wifi, "request_wifi_connect_state_listener"):
+        wifi.request_wifi_connect_state_listener()
+    if hasattr(wifi, "enable_runtime_roaming_suppression"):
+        wifi.enable_runtime_roaming_suppression()
 
     if _uses_tinyusb_primary_console():
         # ESP-IDF's ROM CDC can enumerate without providing a reliable
@@ -525,8 +537,10 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     wifi_var = await cg.get_variable(CORE.config[CONF_WIFI][CONF_ID])
-    cg.add(wifi_var.add_ip_state_listener(var))
-    cg.add(wifi_var.add_connect_state_listener(var))
+    if hasattr(wifi, "request_wifi_ip_state_listener"):
+        cg.add(wifi_var.add_ip_state_listener(var))
+    if hasattr(wifi, "request_wifi_connect_state_listener"):
+        cg.add(wifi_var.add_connect_state_listener(var))
 
     # Set required sdkconfig options for CSI functionality
     # These are automatically applied - user doesn't need to specify them in YAML

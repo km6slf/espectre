@@ -39,13 +39,14 @@ for path in (str(REPO_ROOT), str(PYTHON_ROOT_DIR), str(PYTHON_SRC_DIR), str(TOOL
         sys.path.insert(0, path)
 
 MICROPYTHON_FIRMWARE_BUILD = "20260818-v1.29.0-preview.731.g1c3c201149"
-CHIP_CHOICES = ["esp32", "c3", "s2", "s3", "c5", "c6"]
+CHIP_CHOICES = ["esp32", "c3", "s2", "s3", "s3-macronix", "c5", "c6"]
 MICRO_CHIP_CHOICES = ["esp32", "c3", "s2", "s3", "c5", "c6"]
 CHIP_LABELS = {
     "esp32": "ESP32",
     "c3": "ESP32-C3",
     "s2": "ESP32-S2",
     "s3": "ESP32-S3",
+    "s3-macronix": "ESP32-S3 (Macronix Flash / 40MHz DIO)",
     "c5": "ESP32-C5",
     "c6": "ESP32-C6",
 }
@@ -63,6 +64,7 @@ NATIVE_CONSOLE_BY_CHIP = {
     "c5": "usb_serial_jtag",
     "c6": "usb_serial_jtag",
     "s3": "usb_serial_jtag",
+    "s3-macronix": "usb_serial_jtag",
 }
 class SerialCandidate(NamedTuple):
     device: str
